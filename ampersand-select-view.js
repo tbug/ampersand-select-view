@@ -32,6 +32,13 @@ module.exports = View.extend({
     initialize: function(opts) {
         opts = opts || {};
 
+        function pickOpts(key, defaultValue) {
+            // aux function. Will return value from opts if it is explicitly defined
+            // even if it is falsy. If key is not defined, return default value.
+            if (key in opts) return opts[key];
+            else             return defaultValue;
+        }
+
         if (typeof opts.name !== 'string') throw new Error('SelectView requires a name property.');
         this.name = opts.name;
 
@@ -53,20 +60,16 @@ module.exports = View.extend({
             this.label = opts.label;
         }
         this.parent = opts.parent || this.parent;
-        this.template = opts.template || defaultTemplate;
-        this.unselectedText = opts.unselectedText;
-        this.startingValue = opts.value;
+        this.template = pickOpts('template', this.template || defaultTemplate);
+        this.unselectedText = pickOpts('unselectedText', this.unselectedText);
+        this.startingValue = pickOpts('value', this.startingValue);
         this.yieldModel = (opts.yieldModel === false) ? false : true;
 
-        this.eagerValidate = opts.eagerValidate;
-        this.required = opts.required || false;
-        this.validClass = opts.validClass || 'input-valid';
-        this.invalidClass = opts.invalidClass || 'input-invalid';
-        if (opts.requiredMessage === undefined) {
-            this.requiredMessage = 'Selection required';
-        } else {
-            this.requiredMessage = opts.requiredMessage;
-        }
+        this.eagerValidate = pickOpts('eagerValidate', this.eagerValidate);
+        this.required = pickOpts('required', !!this.required);
+        this.validClass = pickOpts('validClass', this.validClass || 'input-valid');
+        this.invalidClass = pickOpts('invalidClass', this.invalidClass || 'input-invalid');
+        this.requiredMessage = pickOpts('requiredMessage', this.requiredMessage || 'Selection required');
 
         this.onChange = this.onChange.bind(this);
 
